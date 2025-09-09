@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Database Concepts Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .quiz-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .question-card {
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border: 1px solid #d1d5db;
+            margin-bottom: 0.5rem;
+        }
+        .option:hover {
+            background-color: #f3f4f6;
+        }
+        .option input {
+            margin-right: 1rem;
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, box-shadow 0.2s;
+        }
+        .btn-primary {
+            background-color: #4f46e5;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #4338ca;
+        }
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: #1f2937;
+        }
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+        }
+        .feedback {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+        }
+        .feedback.correct {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #6ee7b7;
+        }
+        .feedback.incorrect {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+        .explanation {
+            background-color: #f3f4f6;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            color: #374151;
+            border-left: 4px solid #4f46e5;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <div class="quiz-container">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-2">Advanced Database Concepts Quiz</h1>
+        <p class="text-center text-gray-600 mb-6">Select the single best answer for each conceptual question.</p>
+        
+        <div id="quiz-content">
+            <!-- Questions will be dynamically inserted here -->
+        </div>
+
+        <div id="navigation" class="flex justify-between items-center mt-6">
+            <button id="prev-btn" class="btn btn-secondary">Previous</button>
+            <span id="question-counter" class="text-gray-600 font-medium"></span>
+            <button id="next-btn" class="btn btn-secondary">Next</button>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "Which scenario best illustrates the transformation of data into information?",
+                type: "radio",
+                options: ["Recording every individual sale in a retail store's transaction log.", "Summarizing daily sales logs into a report showing the best-selling products.", "Storing a list of customer names and addresses in a spreadsheet.", "Capturing raw temperature readings from a weather sensor every second.", "Creating a table with columns for 'product_id' and 'price'."],
+                correct: ["Summarizing daily sales logs into a report showing the best-selling products."],
+                explanation: "Data is raw facts (individual sales). Information is processed data that provides context and meaning, such as a report that analyzes those sales to identify trends."
+            },
+            {
+                question: "The ability of a database to contain its own definition or description (metadata) is known as its:",
+                type: "radio",
+                options: ["Concurrent nature", "Self-describing nature", "Abstract nature", "Relational nature", "Transactional nature"],
+                correct: ["Self-describing nature"],
+                explanation: "A key feature of a database system is that it stores metadata (data about data) within its catalog. This makes it self-describing, unlike a simple collection of files where the file structure is defined externally by the application."
+            },
+            {
+                question: "In which phase of database design would an ER diagram be created?",
+                type: "radio",
+                options: ["Physical Design", "Logical Design", "Requirement Analysis", "Conceptual Design", "Schema Refinement"],
+                correct: ["Conceptual Design"],
+                explanation: "Conceptual design is the stage where a high-level, DBMS-independent model of the data is created. The Entity-Relationship (ER) model is a primary tool for this phase."
+            },
+            {
+                question: "What is the primary advantage of data abstraction in a DBMS?",
+                type: "radio",
+                options: ["It ensures that all data is stored in a single, centralized file.", "It allows application programs to be shielded from the details of how data is physically stored.", "It guarantees faster query performance through automatic indexing.", "It provides a mechanism for creating multiple physical copies of the data for safety.", "It enforces strict data type checking for all database operations."],
+                correct: ["It allows application programs to be shielded from the details of how data is physically stored."],
+                explanation: "Data abstraction (or data independence) allows the underlying storage structure of the database to change without requiring modifications to the application code that accesses it, promoting flexibility and easier maintenance."
+            },
+            {
+                question: "Which of the following commands is a Data Manipulation Language (DML) command?",
+                type: "radio",
+                options: ["CREATE VIEW", "ALTER TABLE", "UPDATE", "DROP INDEX", "GRANT"],
+                correct: ["UPDATE"],
+                explanation: "DML commands are used to manage the data within schema objects. `UPDATE`, `INSERT`, and `DELETE` are the core DML commands. The others are DDL (`CREATE`, `ALTER`, `DROP`) or DCL (`GRANT`)."
+            },
+            {
+                question: "A 'Person' entity has an 'Address' attribute, which is further broken down into 'Street', 'City', and 'ZipCode'. 'Address' is an example of a(n):",
+                type: "radio",
+                options: ["Derived attribute", "Multivalued attribute", "Composite attribute", "Simple attribute", "Atomic attribute"],
+                correct: ["Composite attribute"],
+                explanation: "A composite attribute is an attribute that can be divided into smaller, meaningful sub-parts. This allows for more granular querying, such as searching for all people in a specific city."
+            },
+            {
+                question: "If a system stores an employee's 'HireDate' and calculates their 'YearsOfService' on demand, 'YearsOfService' is best described as a(n):",
+                type: "radio",
+                options: ["Key attribute", "Derived attribute", "Multivalued attribute", "Stored attribute", "Descriptive attribute"],
+                correct: ["Derived attribute"],
+                explanation: "A derived attribute's value is not stored directly but is calculated from other stored data. This prevents data inconsistency, as the derived value is always up-to-date based on the source attribute."
+            },
+            {
+                question: "In a project management database, a 'Task' entity cannot exist unless it belongs to a 'Project' entity. The 'Task' entity lacks a standalone primary key. 'Task' is a:",
+                type: "radio",
+                options: ["Strong entity", "Recursive entity", "Master entity", "Weak entity", "Ternary entity"],
+                correct: ["Weak entity"],
+                explanation: "A weak entity is existence-dependent on another (owner) entity and can only be uniquely identified in conjunction with the primary key of that owner entity."
+            },
+            {
+                question: "An ER model showing the relationship between 'Suppliers', 'Parts', and 'Projects' where a specific supplier provides a certain part to a particular project is a:",
+                type: "radio",
+                options: ["Unary relationship", "Binary relationship", "Recursive relationship", "Cyclic relationship", "Ternary relationship"],
+                correct: ["Ternary relationship"],
+                explanation: "This scenario involves a single relationship that connects three distinct entities ('Suppliers', 'Parts', 'Projects'). Therefore, it is a ternary relationship, representing a single fact involving all three."
+            },
+            {
+                question: "An ER diagram shows a single entity, 'Employee', with a relationship 'supervises' that connects 'Employee' to itself. This is a:",
+                type: "radio",
+                options: ["Binary relationship", "Identifying relationship", "Ternary relationship", "Recursive relationship", "Weak relationship"],
+                correct: ["Recursive relationship"],
+                explanation: "A recursive (or unary) relationship is one where instances of the same entity set participate. This is common for modeling hierarchies, such as an organizational chart."
+            },
+            {
+                question: "If an organization's policy states that every department must have a manager, the 'Department' entity's participation in the 'manages' relationship is:",
+                type: "radio",
+                options: ["Partial", "Optional", "Conditional", "Total", "Identifying"],
+                correct: ["Total"],
+                explanation: "Total participation signifies that every instance of an entity set must be involved in the relationship. The keyword 'must' indicates a mandatory, or total, participation."
+            },
+            {
+                question: "What is the defining characteristic of a 'superkey'?",
+                type: "radio",
+                options: ["It must be the shortest possible key.", "It must not contain any NULL values.", "It is a set of attributes that uniquely identifies a record.", "It is selected by the database administrator as the primary identifier.", "It must be a single attribute."],
+                correct: ["It is a set of attributes that uniquely identifies a record."],
+                explanation: "A superkey is any attribute or set of attributes that can uniquely identify a row in a table. It is not necessarily minimal; a candidate key is a minimal superkey."
+            },
+            {
+                question: "A 'candidate key' is best defined as a:",
+                type: "radio",
+                options: ["Superkey that has been chosen to be the primary key.", "Key that contains more than one attribute.", "Minimal superkey.", "Key that is eligible to become a foreign key.", "Superkey that contains at least one non-key attribute."],
+                correct: ["Minimal superkey."],
+                explanation: "A candidate key is a superkey from which no attributes can be removed without losing the uniqueness property. A table can have multiple candidate keys, one of which is chosen to be the primary key."
+            },
+            {
+                question: "When modeling a 'Person' who can have several 'PhoneNumbers', how should this be mapped to a relational schema to maintain normalization?",
+                type: "radio",
+                options: ["Create columns like 'Phone1', 'Phone2', 'Phone3' in the Person table.", "Store all numbers in a single 'PhoneNumbers' text field, separated by commas.", "Create a separate 'PhoneNumber' table with 'PersonID' as a foreign key.", "Disallow multiple phone numbers as they violate relational principles.", "Create a 'PhoneType' column to handle different number types in the Person table."],
+                correct: ["Create a separate 'PhoneNumber' table with 'PersonID' as a foreign key."],
+                explanation: "This handles the multivalued 'PhoneNumbers' attribute. Creating a separate table avoids repeating groups and adheres to First Normal Form (1NF), making the data more flexible and easier to query."
+            },
+            {
+                question: "To model a one-to-many relationship between 'Author' (1) and 'Book' (N), the relational schema should include:",
+                type: "radio",
+                options: ["A 'BookID' foreign key in the 'Author' table.", "An 'AuthorID' foreign key in the 'Book' table.", "A separate 'AuthorBook' bridge table.", "A multivalued 'Books' attribute in the 'Author' table.", "A multivalued 'Authors' attribute in the 'Book' table."],
+                correct: ["An 'AuthorID' foreign key in the 'Book' table."],
+                explanation: "The standard mapping for a 1:N relationship is to place the primary key of the entity on the '1' side ('Author') as a foreign key in the table for the entity on the 'N' side ('Book')."
+            },
+            {
+                question: "A many-to-many relationship between 'Student' and 'Course' is resolved in a relational model by creating:",
+                type: "radio",
+                options: ["A foreign key in the 'Student' table and another in the 'Course' table.", "A single, denormalized table containing both student and course information.", "A new 'Enrollment' table with foreign keys for both 'StudentID' and 'CourseID'.", "A recursive relationship on the 'Student' entity.", "A view that joins the two tables without a physical link."],
+                correct: ["A new 'Enrollment' table with foreign keys for both 'StudentID' and 'CourseID'."],
+                explanation: "M:N relationships require a third table, often called a junction or bridge table. This table resolves the relationship by holding pairs of foreign keys, linking records from the two original tables."
+            },
+            {
+                question: "In mapping an ISA hierarchy, which strategy is most suitable for a scenario where subclasses are disjoint (an entity can be of only one subclass type)?",
+                type: "radio",
+                options: ["A single table with a boolean flag for each subclass.", "A single table with a 'type' discriminator column.", "Separate tables for each subclass that also include all superclass attributes.", "Separate tables for the superclass and each subclass.", "Any of the above are equally suitable for disjoint specializations."],
+                correct: ["A single table with a 'type' discriminator column."],
+                explanation: "While other options can work, creating a single table with a 'type' column (e.g., 'EmployeeType' could be 'Salaried', 'Hourly') is a very efficient and common method for handling disjoint subclasses, especially if they share many attributes."
+            },
+            {
+                question: "Which ISA mapping strategy inherently requires that the specialization must be 'total' (every superclass entity must belong to a subclass)?",
+                type: "radio",
+                options: ["Creating separate tables for the superclass and each subclass.", "Creating tables for the subclasses only, and including all superclass attributes.", "Creating a single table with a 'type' discriminator column.", "Creating a single table with boolean flags for each subclass.", "This constraint cannot be enforced at the schema level."],
+                correct: ["Creating tables for the subclasses only, and including all superclass attributes."],
+                explanation: "This strategy eliminates the superclass table. It's only valid if there are no entities that belong *only* to the superclass, which is the definition of a 'total' specialization."
+            },
+            {
+                question: "Which SQL clause filters the results of an aggregation based on a condition?",
+                type: "radio",
+                options: ["WHERE", "FILTER", "HAVING", "GROUP BY", "CHECK"],
+                correct: ["HAVING"],
+                explanation: "The `HAVING` clause is specifically designed to filter groups after they have been formed by the `GROUP BY` clause. For example, `HAVING COUNT(*) > 5` would only show groups with more than five members."
+            },
+            {
+                question: "To find all products whose names contain the substring '-ROM', which `WHERE` clause is most appropriate?",
+                type: "radio",
+                options: ["WHERE name = '%-ROM%'", "WHERE name CONTAINS '-ROM'", "WHERE name LIKE '_-ROM_'", "WHERE name LIKE '%-ROM%'", "WHERE name LIKE '*-ROM*'"],
+                correct: ["WHERE name LIKE '%-ROM%'"],
+                explanation: "The `LIKE` operator with the `%` wildcard is used for substring matching. `%` matches any sequence of zero or more characters, so `%-ROM%` finds the substring anywhere within the name."
+            },
+            {
+                question: "If you want to sort a result set by 'LastName' alphabetically and then by 'Salary' from highest to lowest, which `ORDER BY` clause is correct?",
+                type: "radio",
+                options: ["ORDER BY LastName, Salary", "ORDER BY LastName ASC, Salary DESC", "ORDER BY LastName; ORDER BY Salary DESC", "ORDER BY LastName AND Salary DESC", "SORT BY LastName ASC, Salary DESC"],
+                correct: ["ORDER BY LastName ASC, Salary DESC"],
+                explanation: "Multiple sort criteria can be specified, separated by commas. The default order is `ASC` (ascending). To sort from highest to lowest, the `DESC` (descending) keyword must be explicitly used for that column."
+            },
+            {
+                question: "Which function calculates the arithmetic mean of a set of numerical values in a column?",
+                type: "radio",
+                options: ["SUM()", "AVG()", "MEAN()", "COUNT()", "MEDIAN()"],
+                correct: ["AVG()"],
+                explanation: "`AVG()` is the standard SQL aggregate function for calculating the average of a set of numbers. The other functions perform different calculations."
+            },
+            {
+                question: "To retrieve a list of all customers and any orders they have placed, including customers who have never placed an order, you should use a:",
+                type: "radio",
+                options: ["INNER JOIN", "CROSS JOIN", "RIGHT JOIN from Customer to Order", "LEFT JOIN from Customer to Order", "FULL JOIN"],
+                correct: ["LEFT JOIN from Customer to Order"],
+                explanation: "A `LEFT JOIN` will return all rows from the left table (Customer) regardless of whether they have a match in the right table (Order). Customers with no orders will have NULL values for the order columns."
+            },
+            {
+                question: "The referential integrity action `ON DELETE CASCADE` implies that if a record in the parent table is deleted, then:",
+                type: "radio",
+                options: ["The deletion is prevented.", "The corresponding foreign key values in the child table are set to NULL.", "The corresponding foreign key values in the child table are set to their default values.", "All corresponding records in the child table will also be deleted.", "An error is raised, and the transaction is rolled back."],
+                correct: ["All corresponding records in the child table will also be deleted."],
+                explanation: "`ON DELETE CASCADE` creates a cascading effect where deleting a parent record automatically deletes all child records that reference it. This should be used with caution."
+            },
+            {
+                question: "To remove all rows from a table named 'Log' but keep the table structure, which command is generally most efficient?",
+                type: "radio",
+                options: ["DELETE FROM Log;", "DROP TABLE Log;", "REMOVE * FROM Log;", "TRUNCATE TABLE Log;", "UPDATE Log SET * = NULL;"],
+                correct: ["TRUNCATE TABLE Log;"],
+                explanation: "`TRUNCATE TABLE` is a DDL operation that quickly removes all records by deallocating the data pages. It is much faster than `DELETE`, which removes rows one by one and logs each deletion."
+            },
+            {
+                question: "In the formal relational model, the definition of a table's columns and their data types is known as the:",
+                type: "radio",
+                options: ["Relational Instance", "Relational Domain", "Relational Schema", "Relational Tuple", "Relational Degree"],
+                correct: ["Relational Schema"],
+                explanation: "The schema defines the structure of the relation (table), including the names and data types (domains) of its attributes (columns). The instance refers to the actual data at a point in time."
+            },
+            {
+                question: "A `UNIQUE` constraint applied to a column ensures that:",
+                type: "radio",
+                options: ["The column cannot contain NULL values.", "All values in that column are distinct from one another, though it may allow one NULL value.", "The column is automatically indexed by the database system.", "The column must be part of the primary key.", "The values in the column must match values in another table's primary key."],
+                correct: ["All values in that column are distinct from one another, though it may allow one NULL value."],
+                explanation: "A `UNIQUE` constraint guarantees that all values in a column (or a set of columns) are unique. Unlike a primary key, most database systems allow a single NULL value in a column with a unique constraint."
+            },
+            {
+                question: "Which of the following database objects does not store data itself but is a stored query that can be treated as a virtual table?",
+                type: "radio",
+                options: ["Index", "Schema", "Table", "View", "Trigger"],
+                correct: ["View"],
+                explanation: "A view is a named `SELECT` query whose result set is dynamically generated when accessed. It provides a way to simplify complex queries, encapsulate logic, and restrict data access."
+            },
+            {
+                question: "An application that faces rapidly growing user numbers and data volume would most benefit from which database characteristic?",
+                type: "radio",
+                options: ["Data integrity", "Transaction support", "Scalability", "Data abstraction", "Security"],
+                correct: ["Scalability"],
+                explanation: "Scalability is the ability of a system to handle a growing amount of work by adding resources. For applications with increasing load, a scalable database (often found in cloud environments) is critical."
+            },
+            {
+                question: "A cloud service model where the provider manages the hardware, operating system, and database software, allowing users to simply connect and use the database, is called:",
+                type: "radio",
+                options: ["On-Premise as a Service (OPaaS)", "Infrastructure as a Service (IaaS)", "Platform as a Service (PaaS)", "Database as a Service (DBaaS)", "Software as a Service (SaaS)"],
+                correct: ["Database as a Service (DBaaS)"],
+                explanation: "DBaaS is a specific type of PaaS/SaaS that provides a fully managed database environment, abstracting away the underlying infrastructure and administrative tasks from the user."
+            },
+            {
+                question: "If the primary key of an 'OrderLineItem' table is (`OrderID`, `ProductID`), this key is best described as a:",
+                type: "radio",
+                options: ["Partial key", "Surrogate key", "Superkey", "Foreign key", "Composite key"],
+                correct: ["Composite key"],
+                explanation: "A composite key (or compound key) is a primary key that consists of two or more attributes that together uniquely identify a record. This is common in junction tables or weak entities."
+            },
+            {
+                question: "In an e-commerce ER model, the relationship between 'Customer' and 'ShippingAddress' is most likely:",
+                type: "radio",
+                options: ["1:1", "1:N", "N:M", "Recursive", "Identifying"],
+                correct: ["1:N"],
+                explanation: "A single customer can have multiple shipping addresses stored in their profile, but each individual shipping address record belongs to only one customer. This is a classic one-to-many relationship."
+            },
+            {
+                question: "Which function would you use to find the highest salary from an 'Employees' table?",
+                type: "radio",
+                options: ["UPPER()", "MAX()", "TOP()", "LAST()", "CEILING()"],
+                correct: ["MAX()"],
+                explanation: "`MAX()` is the standard SQL aggregate function used to find the maximum value in a set of values within a specified column."
+            },
+            {
+                question: "What is the purpose of the SQL `AS` keyword in a `SELECT` statement?",
+                type: "radio",
+                options: ["To filter results based on a condition.", "To create a temporary alias for a column or table name.", "To convert a value from one data type to another.", "To check for equality between two values.", "To specify the sort order of the result set."],
+                correct: ["To create a temporary alias for a column or table name."],
+                explanation: "The `AS` keyword is used to assign a temporary, more readable name (an alias) to a column or table in a query. This is especially useful for calculated columns or when table names are long."
+            },
+            {
+                question: "Which phase of the database design process focuses on converting the conceptual model into a schema for a specific data model (e.g., relational)?",
+                type: "radio",
+                options: ["Physical Design", "Logical Design", "Requirement Analysis", "Implementation", "Security Design"],
+                correct: ["Logical Design"],
+                explanation: "Logical design bridges the gap between the abstract conceptual model and the concrete physical implementation. It involves creating a schema in the chosen data model (like the relational model) without considering the specific storage details."
+            },
+            {
+                question: "A 'partial key' or 'discriminator' is an attribute used to uniquely identify an instance of a:",
+                type: "radio",
+                options: ["Strong entity", "Recursive relationship", "Superclass entity", "Weak entity", "Ternary relationship"],
+                correct: ["Weak entity"],
+                explanation: "A partial key distinguishes weak entities that are related to the same owner entity. The full primary key of the weak entity is formed by combining the owner's primary key with this partial key."
+            },
+            {
+                question: "When mapping a composite attribute from an ER diagram, such as `FullName(FirstName, LastName)`, to a relational table, the standard practice is to:",
+                type: "radio",
+                options: ["Create a single 'FullName' column.", "Create separate columns for 'FirstName' and 'LastName'.", "Create a separate 'Name' table with a foreign key.", "Store the name as a JSON object.", "Use a special composite data type if available."],
+                correct: ["Create separate columns for 'FirstName' and 'LastName'."],
+                explanation: "The components of a composite attribute are typically mapped as individual columns in the relational table. This allows for greater flexibility in querying and sorting (e.g., sorting by last name)."
+            },
+            {
+                question: "In the logical processing order of an SQL query, which clause is evaluated before the `SELECT` clause?",
+                type: "radio",
+                options: ["ORDER BY", "LIMIT", "HAVING", "FETCH", "None of the above"],
+                correct: ["HAVING"],
+                explanation: "The typical logical query processing order is FROM -> WHERE -> GROUP BY -> HAVING -> SELECT -> ORDER BY. Therefore, the `HAVING` clause, which filters groups, is evaluated before the final `SELECT` list is projected."
+            },
+            {
+                question: "What is the primary function of the `DISTINCT` keyword in SQL?",
+                type: "radio",
+                options: ["To count the number of unique values in a column.", "To sort the result set in a unique, non-alphabetical order.", "To ensure that all rows in the final result set are unique.", "To select only columns that have a unique constraint defined.", "To create a unique index on a table."],
+                correct: ["To ensure that all rows in the final result set are unique."],
+                explanation: "`SELECT DISTINCT` operates on the entire row of the result set, eliminating any rows that are complete duplicates of other rows."
+            },
+            {
+                question: "An attribute on a relationship, such as the 'date_assigned' on a 'Works_On' relationship between 'Employee' and 'Project', is called a(n):",
+                type: "radio",
+                options: ["Composite attribute", "Derived attribute", "Key attribute", "Descriptive attribute", "Foreign attribute"],
+                correct: ["Descriptive attribute"],
+                explanation: "A descriptive attribute stores information about the relationship itself rather than about either of the participating entities. When mapped, this attribute becomes a column in the junction table created for the relationship."
+            },
+            {
+                question: "Which of the following is a primary goal of database normalization?",
+                type: "radio",
+                options: ["To maximize data redundancy to ensure data availability.", "To minimize data redundancy and improve data integrity.", "To increase query execution speed by creating wider tables.", "To simplify the conceptual model by merging entities.", "To denormalize the schema for performance automatically."],
+                correct: ["To minimize data redundancy and improve data integrity."],
+                explanation: "Normalization is the process of organizing columns and tables in a relational database to minimize data redundancy. Reducing redundancy helps prevent insertion, update, and deletion anomalies."
+            },
+            {
+                question: "An `INNER JOIN` is functionally equivalent to which older join syntax?",
+                type: "radio",
+                options: ["A `CROSS JOIN` with a `WHERE` clause.", "A `LEFT JOIN` where the right side is never NULL.", "A `UNION` of two tables.", "A subquery with an `EXISTS` clause.", "A `FULL OUTER JOIN` where no NULLs are present."],
+                correct: ["A `CROSS JOIN` with a `WHERE` clause."],
+                explanation: "The explicit `INNER JOIN ... ON` syntax is the modern standard. The older, implicit syntax involved listing tables in the `FROM` clause (which creates a Cartesian product, or cross join) and then specifying the join condition in the `WHERE` clause."
+            },
+            {
+                question: "Which database design phase involves decisions like choosing file structures and creating indexes to optimize performance?",
+                type: "radio",
+                options: ["Conceptual Design", "Logical Design", "Physical Design", "Requirement Analysis", "Data Modeling"],
+                correct: ["Physical Design"],
+                explanation: "Physical design is concerned with the actual implementation and storage of the database on a specific DBMS. It translates the logical schema into a set of physical storage decisions to ensure performance goals are met."
+            },
+            {
+                question: "The `WHERE salary BETWEEN 50000 AND 70000` clause will select employees whose salary is:",
+                type: "radio",
+                options: ["Greater than 50000 and less than 70000.", "Greater than or equal to 50000 and less than or equal to 70000.", "Equal to 50000 or 70000 only.", "Less than 50000 or greater than 70000.", "Only values between 50001 and 69999."],
+                correct: ["Greater than or equal to 50000 and less than or equal to 70000."],
+                explanation: "The SQL `BETWEEN` operator is inclusive, meaning it includes the start and end values in its range check. It is a shorthand for `>=` and `<=`."
+            },
+            {
+                question: "What does it mean for a database to have a 'self-describing' nature?",
+                type: "radio",
+                options: ["It can generate its own user documentation.", "It stores a description of its structure (metadata) within the database itself.", "The data is stored in plain text files that are easily readable.", "It requires no external application to be useful.", "It can automatically correct errors in the data."],
+                correct: ["It stores a description of its structure (metadata) within the database itself."],
+                explanation: "A database system includes a data dictionary or catalog that contains metadata—information about the tables, columns, data types, constraints, etc. This makes the system self-contained and self-describing."
+            },
+            {
+                question: "For a 'Country' table, which attribute would be the most suitable primary key?",
+                type: "radio",
+                options: ["CountryName", "CapitalCity", "Population", "ISO_3166_Code", "Continent"],
+                correct: ["ISO_3166_Code"],
+                explanation: "A primary key should be unique and stable (unlikely to change). Country names can have variations or change. An official, standardized code like the ISO code is designed to be a unique and permanent identifier, making it an ideal primary key."
+            },
+            {
+                question: "To find all customers whose last name is exactly 'Smith', which `WHERE` clause is the most direct and efficient?",
+                type: "radio",
+                options: ["WHERE LastName LIKE 'Smith'", "WHERE LastName = 'Smith'", "WHERE LastName LIKE 'Smith%'", "WHERE LastName IN ('Smith')", "WHERE LastName LIKE '_mith'"],
+                correct: ["WHERE LastName = 'Smith'"],
+                explanation: "For an exact match, the equality operator `=` is the most appropriate and typically the most performant. `LIKE` is designed for pattern matching and is unnecessary here."
+            },
+            {
+                question: "A `RIGHT JOIN` from 'Products' (left) to 'Categories' (right) will ensure that the result set includes:",
+                type: "radio",
+                options: ["All products, regardless of whether they have a category.", "Only products that have a valid category.", "All categories, regardless of whether they have any products.", "Only categories that contain at least one product.", "A full list of all products and all categories."],
+                correct: ["All categories, regardless of whether they have any products."],
+                explanation: "A `RIGHT JOIN` prioritizes the table on the right side of the operator. It will return all rows from the 'Categories' table, and will show matching product information where it exists, or NULLs otherwise."
+            },
+            {
+                question: "In the context of the relational model, the term 'relation' is the formal name for a:",
+                type: "radio",
+                options: ["Row", "Column", "Table", "Database", "Key"],
+                correct: ["Table"],
+                explanation: "The foundational terminology of the relational model, developed by E.F. Codd, uses the mathematical term 'relation' to refer to what is commonly known as a table."
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let userAnswers = Array(quizData.length).fill(null);
+
+        const quizContent = document.getElementById('quiz-content');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const questionCounter = document.getElementById('question-counter');
+
+        function renderQuestion() {
+            const questionData = quizData[currentQuestionIndex];
+            let optionsHtml = '';
+
+            questionData.options.forEach((option, index) => {
+                const inputId = `q${currentQuestionIndex}-option${index}`;
+                optionsHtml += `
+                    <label for="${inputId}" class="option">
+                        <input type="${questionData.type}" id="${inputId}" name="question${currentQuestionIndex}" value="${option}">
+                        <span>${option}</span>
+                    </label>
+                `;
+            });
+
+            quizContent.innerHTML = `
+                <div class="question-card">
+                    <div class="mb-4">
+                        <p class="text-sm font-semibold text-indigo-600">Question (Select the best answer)</p>
+                        <h2 class="text-xl font-semibold text-gray-800">${currentQuestionIndex + 1}. ${questionData.question}</h2>
+                    </div>
+                    <div id="options-container">${optionsHtml}</div>
+                    <div class="mt-4">
+                        <button class="btn btn-primary" onclick="checkAnswer()">Check My Answer</button>
+                    </div>
+                    <div id="feedback-container" class="mt-4"></div>
+                </div>
+            `;
+
+            updateNavigation();
+            restoreAnswer();
+        }
+
+        function updateNavigation() {
+            prevBtn.disabled = currentQuestionIndex === 0;
+            nextBtn.disabled = currentQuestionIndex === quizData.length - 1;
+            prevBtn.classList.toggle('opacity-50', prevBtn.disabled);
+            prevBtn.classList.toggle('cursor-not-allowed', prevBtn.disabled);
+            nextBtn.classList.toggle('opacity-50', nextBtn.disabled);
+            nextBtn.classList.toggle('cursor-not-allowed', nextBtn.disabled);
+            questionCounter.textContent = `Question ${currentQuestionIndex + 1} of ${quizData.length}`;
+        }
+
+        function checkAnswer() {
+            const questionData = quizData[currentQuestionIndex];
+            const feedbackContainer = document.getElementById('feedback-container');
+            
+            const selectedOptions = Array.from(document.querySelectorAll(`input[name="question${currentQuestionIndex}"]:checked`)).map(el => el.value);
+            userAnswers[currentQuestionIndex] = selectedOptions;
+
+            let isCorrect = selectedOptions.length === 1 && selectedOptions[0] === questionData.correct[0];
+            
+            let feedbackHtml = '';
+            if (isCorrect) {
+                feedbackHtml = `<div class="feedback correct"><strong>Correct!</strong> Well done.</div>`;
+            } else {
+                feedbackHtml = `<div class="feedback incorrect"><strong>Incorrect.</strong> Please review the explanation below.</div>`;
+            }
+
+            feedbackHtml += `<div class="explanation"><strong>Explanation:</strong> ${questionData.explanation}</div>`;
+            feedbackContainer.innerHTML = feedbackHtml;
+
+            // Disable inputs and button after checking
+            document.querySelectorAll(`input[name="question${currentQuestionIndex}"]`).forEach(input => input.disabled = true);
+            document.querySelector('.btn-primary').disabled = true;
+            document.querySelector('.btn-primary').classList.add('opacity-50', 'cursor-not-allowed');
+        }
+        
+        function saveAnswer() {
+             const selectedOptions = Array.from(document.querySelectorAll(`input[name="question${currentQuestionIndex}"]:checked`)).map(el => el.value);
+             if (selectedOptions.length > 0) {
+                userAnswers[currentQuestionIndex] = selectedOptions;
+             } else {
+                userAnswers[currentQuestionIndex] = null;
+             }
+        }
+
+        function restoreAnswer() {
+            const savedAnswer = userAnswers[currentQuestionIndex];
+            if (savedAnswer && savedAnswer.length > 0) {
+                const input = document.querySelector(`input[name="question${currentQuestionIndex}"][value="${CSS.escape(savedAnswer[0])}"]`);
+                if (input) {
+                    input.checked = true;
+                }
+            }
+        }
+
+        prevBtn.addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                saveAnswer();
+                currentQuestionIndex--;
+                renderQuestion();
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentQuestionIndex < quizData.length - 1) {
+                saveAnswer();
+                currentQuestionIndex++;
+                renderQuestion();
+            }
+        });
+
+        // Initial render
+        renderQuestion();
+    </script>
+
+</body>
+</html>
