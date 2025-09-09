@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Design & Development Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .quiz-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .question-card {
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border: 1px solid #d1d5db;
+            margin-bottom: 0.5rem;
+        }
+        .option:hover {
+            background-color: #f3f4f6;
+        }
+        .option input {
+            margin-right: 1rem;
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, box-shadow 0.2s;
+        }
+        .btn-primary {
+            background-color: #4f46e5;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #4338ca;
+        }
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: #1f2937;
+        }
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+        }
+        .feedback {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+        }
+        .feedback.correct {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #6ee7b7;
+        }
+        .feedback.incorrect {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+        .explanation {
+            background-color: #f3f4f6;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            color: #374151;
+            border-left: 4px solid #4f46e5;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <div class="quiz-container">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-2">Database Design Quiz</h1>
+        <p class="text-center text-gray-600 mb-6">Test your knowledge with the questions below.</p>
+        
+        <div id="quiz-content">
+            <!-- Questions will be dynamically inserted here -->
+        </div>
+
+        <div id="navigation" class="flex justify-between items-center mt-6">
+            <button id="prev-btn" class="btn btn-secondary">Previous</button>
+            <span id="question-counter" class="text-gray-600 font-medium"></span>
+            <button id="next-btn" class="btn btn-secondary">Next</button>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            // Select All That Apply Questions (20)
+            {
+                question: "Which of the following are considered benefits of the database approach over traditional file processing systems? (Select all that apply)",
+                type: "checkbox",
+                options: ["Data independence from applications", "Increased data redundancy", "Enforcement of integrity constraints", "Efficient concurrent access for multiple users"],
+                correct: ["Data independence from applications", "Enforcement of integrity constraints", "Efficient concurrent access for multiple users"],
+                explanation: "The database approach offers several advantages, including data independence (separating data structure from application logic), enforcing data integrity through constraints, and managing concurrent access efficiently. Increased data redundancy is a problem of file processing systems that databases aim to reduce."
+            },
+            {
+                question: "In SQL, which of the following are Data Definition Language (DDL) commands? (Select all that apply)",
+                type: "checkbox",
+                options: ["CREATE", "SELECT", "ALTER", "INSERT", "DROP"],
+                correct: ["CREATE", "ALTER", "DROP"],
+                explanation: "DDL commands are used to define and manage the database structure. `CREATE`, `ALTER`, and `DROP` are core DDL commands used to create, modify, and delete database objects like tables. `SELECT` and `INSERT` are Data Manipulation Language (DML) commands."
+            },
+            {
+                question: "Which characteristics describe a weak entity in an ER model? (Select all that apply)",
+                type: "checkbox",
+                options: ["It has its own primary key composed entirely of its own attributes.", "Its existence is dependent on another entity (the owner entity).", "It is represented by a double-lined rectangle.", "The relationship with its owner entity is called an identifying relationship."],
+                correct: ["Its existence is dependent on another entity (the owner entity).", "It is represented by a double-lined rectangle.", "The relationship with its owner entity is called an identifying relationship."],
+                explanation: "A weak entity cannot be uniquely identified by its own attributes alone and depends on a strong (owner) entity. This dependency is shown with a double-lined rectangle for the entity and a double-lined diamond for the identifying relationship."
+            },
+            {
+                question: "When mapping a one-to-many (1:N) relationship to a relational schema, which of the following steps are correct? (Select all that apply)",
+                type: "checkbox",
+                options: ["Create a separate table for the relationship.", "Place the primary key of the 'N' side entity as a foreign key in the '1' side entity's table.", "Place the primary key of the '1' side entity as a foreign key in the 'N' side entity's table.", "The foreign key in the 'N' side table references the primary key of the '1' side table."],
+                correct: ["Place the primary key of the '1' side entity as a foreign key in the 'N' side entity's table.", "The foreign key in the 'N' side table references the primary key of the '1' side table."],
+                explanation: "The standard way to map a 1:N relationship is to include the primary key of the entity on the '1' side as a foreign key in the table for the entity on the 'N' side. This effectively links the 'many' to the 'one'."
+            },
+            {
+                question: "Which of the following are valid types of attributes in an ER model? (Select all that apply)",
+                type: "checkbox",
+                options: ["Composite", "Derived", "Multivalued", "Recursive"],
+                correct: ["Composite", "Derived", "Multivalued"],
+                explanation: "Attributes in an ER model can be composite (divisible into sub-parts, like an address), derived (calculated from another attribute, like age from date of birth), or multivalued (can hold multiple values, like phone numbers). 'Recursive' describes a type of relationship, not an attribute."
+            },
+             {
+                question: "In database design, which of these phases are part of the standard process? (Select all that apply)",
+                type: "checkbox",
+                options: ["Requirement Collection and Analysis", "Conceptual Database Design", "Schema Refinement", "Code Implementation"],
+                correct: ["Requirement Collection and Analysis", "Conceptual Database Design", "Schema Refinement"],
+                explanation: "The database design process includes requirement analysis, conceptual design (e.g., ER modeling), logical design (mapping to a data model), schema refinement (normalization), and physical design. Code implementation is a subsequent development phase, not a design phase."
+            },
+            {
+                question: "Which of the following are valid SQL join types? (Select all that apply)",
+                type: "checkbox",
+                options: ["INNER JOIN", "OUTER JOIN", "LEFT JOIN", "CROSS JOIN"],
+                correct: ["INNER JOIN", "OUTER JOIN", "LEFT JOIN", "CROSS JOIN"],
+                explanation: "SQL supports several join types. `INNER JOIN` returns matching rows. `OUTER JOIN` includes `LEFT`, `RIGHT`, and `FULL` joins, which return all rows from one or both tables. `CROSS JOIN` produces a Cartesian product of the tables."
+            },
+            {
+                question: "A superkey has which of the following properties? (Select all that apply)",
+                type: "checkbox",
+                options: ["It is a set of one or more attributes that, taken collectively, allows us to identify uniquely an entity in the entity set.", "It must be minimal.", "A primary key is a type of superkey.", "It can contain extraneous attributes not needed for unique identification."],
+                correct: ["It is a set of one or more attributes that, taken collectively, allows us to identify uniquely an entity in the entity set.", "A primary key is a type of superkey.", "It can contain extraneous attributes not needed for unique identification."],
+                explanation: "A superkey is any set of attributes that uniquely identifies a tuple. It doesn't have to be minimal (a candidate key is a minimal superkey). Therefore, a primary key is a candidate key and also a superkey. A superkey can have extra attributes, e.g., if `StudentID` is a key, then (`StudentID`, `Name`) is a superkey."
+            },
+            {
+                question: "Cloud databases like AWS RDS and Google Cloud SQL offer which of the following advantages? (Select all that apply)",
+                type: "checkbox",
+                options: ["They are always less expensive than on-premise solutions.", "They provide scalability to handle dynamic workloads.", "They are offered as fully managed services (DBaaS).", "They eliminate the need for an internet connection."],
+                correct: ["They provide scalability to handle dynamic workloads.", "They are offered as fully managed services (DBaaS)."],
+                explanation: "Cloud databases excel at scalability and are often provided as DBaaS (Database as a Service), which simplifies management. While they can be cost-effective, they are not always cheaper than on-premise solutions for all use cases, and they inherently require a stable internet connection."
+            },
+            {
+                question: "Which SQL clauses can be used with aggregate functions? (Select all that apply)",
+                type: "checkbox",
+                options: ["WHERE", "SELECT", "HAVING", "ORDER BY"],
+                correct: ["SELECT", "HAVING", "ORDER BY"],
+                explanation: "Aggregate functions like `COUNT()` or `AVG()` are used in the `SELECT` list. The `HAVING` clause is specifically designed to filter groups based on the results of aggregate functions. You can also `ORDER BY` the result of an aggregate function."
+            },
+            {
+                question: "What are the characteristics of a relational database model? (Select all that apply)",
+                type: "checkbox",
+                options: ["Data is organized in tables (relations).", "Each table has rows (tuples) and columns (attributes).", "Relationships are represented by a hierarchical tree structure.", "It is based on set theory and first-order predicate logic."],
+                correct: ["Data is organized in tables (relations).", "Each table has rows (tuples) and columns (attributes).", "It is based on set theory and first-order predicate logic."],
+                explanation: "The relational model, introduced by E.F. Codd, represents data in tables (relations) consisting of rows (tuples) and columns (attributes). Its mathematical foundation is in set theory. A hierarchical tree structure is characteristic of the hierarchical model, not the relational model."
+            },
+            {
+                question: "In an ER diagram, total participation is indicated by what? (Select all that apply)",
+                type: "checkbox",
+                options: ["A double line connecting the entity to the relationship.", "A single line connecting the entity to the relationship.", "The (min, max) notation where min is 1 or more.", "An arrow pointing from the entity to the relationship."],
+                correct: ["A double line connecting the entity to the relationship.", "The (min, max) notation where min is 1 or more."],
+                explanation: "Total participation, which means every entity in the set must participate in the relationship, is most commonly represented by a double line. In notations that use (min, max) constraints, a minimum participation of 1 signifies total participation."
+            },
+            {
+                question: "Data-intensive applications typically have which of the following requirements? (Select all that apply)",
+                type: "checkbox",
+                options: ["Handling large volumes of data.", "Performing complex, CPU-bound computations.", "Requiring fast and consistent data access.", "Supporting multiple concurrent users."],
+                correct: ["Handling large volumes of data.", "Requiring fast and consistent data access.", "Supporting multiple concurrent users."],
+                explanation: "Data-intensive applications are defined by their focus on data volume, velocity, and variety. They need to store, retrieve, and process large amounts of data quickly and reliably for many users at once. Complex, CPU-bound tasks are characteristic of compute-intensive applications."
+            },
+            {
+                question: "When mapping an ISA (specialization/generalization) hierarchy, which are valid options? (Select all that apply)",
+                type: "checkbox",
+                options: ["Create a table for the superclass and separate tables for each subclass.", "Create tables only for the subclasses, including all attributes from the superclass.", "Create a single table containing all attributes from the superclass and all subclasses.", "Create a separate table for the ISA relationship itself."],
+                correct: ["Create a table for the superclass and separate tables for each subclass.", "Create tables only for the subclasses, including all attributes from the superclass.", "Create a single table containing all attributes from the superclass and all subclasses."],
+                explanation: "There are several standard strategies for mapping ISA hierarchies, including creating separate tables for each class, rolling attributes down into subclass tables, or rolling all attributes up into a single superclass table with a type discriminator. Creating a table for the relationship itself is not a standard approach."
+            },
+            {
+                question: "Which constraints can be defined in SQL to ensure data integrity? (Select all that apply)",
+                type: "checkbox",
+                options: ["PRIMARY KEY", "FOREIGN KEY", "UNIQUE", "CHECK"],
+                correct: ["PRIMARY KEY", "FOREIGN KEY", "UNIQUE", "CHECK"],
+                explanation: "`PRIMARY KEY` ensures uniqueness and not-null. `FOREIGN KEY` enforces referential integrity. `UNIQUE` ensures all values in a column are distinct. `CHECK` enforces a specific condition on the values in a column. All are fundamental for maintaining data integrity."
+            },
+            {
+                question: "Which of these are features of a DBMS? (Select all that apply)",
+                type: "checkbox",
+                options: ["Query processing and optimization.", "Backup and recovery mechanisms.", "Security and authorization controls.", "Operating system kernel."],
+                correct: ["Query processing and optimization.", "Backup and recovery mechanisms.", "Security and authorization controls."],
+                explanation: "A DBMS is a sophisticated software system that provides core functionalities like query processing, backup/recovery, and security. The operating system kernel is the core of the OS, which the DBMS runs on top of, but it is not a feature of the DBMS itself."
+            },
+            {
+                question: "A composite attribute in an ER diagram is an attribute that: (Select all that apply)",
+                type: "checkbox",
+                options: ["Can be divided into smaller sub-parts.", "Is represented by an oval connected to other ovals.", "Cannot be a key attribute.", "An example is 'Address' being broken down into 'Street', 'City', and 'Zip Code'."],
+                correct: ["Can be divided into smaller sub-parts.", "Is represented by an oval connected to other ovals.", "An example is 'Address' being broken down into 'Street', 'City', and 'Zip Code'."],
+                explanation: "A composite attribute is one that can be subdivided. Its structure is shown by connecting smaller attribute ovals to the main composite attribute oval. While less common, a composite attribute can be part of a key (making it a composite key)."
+            },
+            {
+                question: "The `LIKE` operator in SQL can be used with which wildcard characters? (Select all that apply)",
+                type: "checkbox",
+                options: ["% (percent sign)", "_ (underscore)", "* (asterisk)", "? (question mark)"],
+                correct: ["% (percent sign)", "_ (underscore)"],
+                explanation: "The SQL `LIKE` operator uses `%` to match any sequence of zero or more characters and `_` to match any single character. Asterisk (*) and question mark (?) are common wildcards in other contexts like file systems, but not in standard SQL."
+            },
+            {
+                question: "When mapping a many-to-many (M:N) relationship, a new relation is created. This new relation should contain: (Select all that apply)",
+                type: "checkbox",
+                options: ["The primary keys of the two participating entities as foreign keys.", "Any descriptive attributes of the relationship.", "A new, surrogate primary key.", "All attributes from both participating entities."],
+                correct: ["The primary keys of the two participating entities as foreign keys.", "Any descriptive attributes of the relationship.", "A new, surrogate primary key."],
+                explanation: "The bridge/junction table for an M:N relationship must contain foreign keys referencing the participating entities. These foreign keys typically form a composite primary key. Any attributes of the relationship itself (descriptive attributes) also belong in this table. A surrogate key can be added as an alternative primary key."
+            },
+            {
+                question: "What does a `RIGHT OUTER JOIN` from Table A to Table B ensure? (Select all that apply)",
+                type: "checkbox",
+                options: ["All rows from Table B are included in the result.", "All rows from Table A are included in the result.", "For rows in Table B that have no match in Table A, the columns from Table A will be NULL.", "It is functionally identical to a `LEFT OUTER JOIN` from Table B to Table A."],
+                correct: ["All rows from Table B are included in the result.", "For rows in Table B that have no match in Table A, the columns from Table A will be NULL.", "It is functionally identical to a `LEFT OUTER JOIN` from Table B to Table A."],
+                explanation: "A `RIGHT JOIN` prioritizes the table on the right side of the join operator (`Table B`). It includes all rows from that table. If a row from `Table B` has no match in `Table A`, the result will show NULLs for `Table A`'s columns. This logic is the inverse of a `LEFT JOIN`."
+            },
+            // MCQ Questions (15)
+            {
+                question: "In the context of the database design process, which phase involves converting the conceptual schema into the data model of a specific DBMS?",
+                type: "radio",
+                options: ["Logical Database Design", "Physical Database Design", "Requirement Collection and Analysis", "Conceptual Database Design"],
+                correct: ["Logical Database Design"],
+                explanation: "Logical Database Design is the phase where the high-level conceptual model (like an ER diagram) is translated into a schema for a specific data model (e.g., relational, document) that a chosen DBMS can implement."
+            },
+            {
+                question: "An attribute that can be calculated from other attributes (e.g., 'age' from 'date of birth') is known as a:",
+                type: "radio",
+                options: ["Composite attribute", "Derived attribute", "Multivalued attribute", "Key attribute"],
+                correct: ["Derived attribute"],
+                explanation: "A derived attribute's value is not stored directly but is calculated from other stored attributes. In an ER diagram, it is typically represented by a dotted oval."
+            },
+            {
+                question: "A relationship between instances of the same entity type is called a:",
+                type: "radio",
+                options: ["Binary relationship", "Ternary relationship", "Recursive relationship", "Identifying relationship"],
+                correct: ["Recursive relationship"],
+                explanation: "A recursive (or unary) relationship associates an entity with itself. A classic example is an 'Employee' entity where one employee can supervise other employees."
+            },
+            {
+                question: "If a department MUST be managed by an employee, what kind of participation does the 'Department' entity have in the 'manages' relationship?",
+                type: "radio",
+                options: ["Partial", "Total", "Optional", "Weak"],
+                correct: ["Total"],
+                explanation: "Total participation means that every instance of the entity set must participate in the relationship. Since every department must have a manager, its participation is total."
+            },
+            {
+                question: "When mapping an ER diagram to a relational model, how is a many-to-many relationship typically handled?",
+                type: "radio",
+                options: ["By adding a foreign key to one of the entity tables.", "By creating a new relation (table) that includes the primary keys of both entities.", "By combining both entities into a single table.", "By adding a multivalued attribute to one of the entities."],
+                correct: ["By creating a new relation (table) that includes the primary keys of both entities."],
+                explanation: "A many-to-many relationship cannot be represented with a single foreign key. The standard solution is to create a third table, often called a junction or bridge table, which holds foreign keys that reference the primary keys of the two original tables."
+            },
+            {
+                question: "Which SQL keyword is used to eliminate duplicate rows from a query result?",
+                type: "radio",
+                options: ["UNIQUE", "DISTINCT", "DIFFERENT", "NO DUPLICATES"],
+                correct: ["DISTINCT"],
+                explanation: "The `DISTINCT` keyword, when used with `SELECT`, ensures that only unique rows are returned in the result set, removing any duplicates."
+            },
+            {
+                question: "What is the primary purpose of the `GROUP BY` clause in a SQL query?",
+                type: "radio",
+                options: ["To sort the results in a specific order.", "To filter rows based on a condition.", "To arrange rows from one or more tables into groups based on column values.", "To join multiple tables together."],
+                correct: ["To arrange rows from one or more tables into groups based on column values."],
+                explanation: "The `GROUP BY` clause is used with aggregate functions (like COUNT, SUM, AVG) to group rows that have the same values in specified columns into summary rows."
+            },
+            {
+                question: "In the relational model, what is a tuple?",
+                type: "radio",
+                options: ["A column in a table", "A row in a table", "A constraint on a table", "A data type"],
+                correct: ["A row in a table"],
+                explanation: "In relational database terminology, a table is a 'relation', a column is an 'attribute', and a row is a 'tuple'."
+            },
+            {
+                question: "What does the `HAVING` clause do in a SQL query?",
+                type: "radio",
+                options: ["It specifies a search condition for a group or an aggregate.", "It is a replacement for the `WHERE` clause in all queries.", "It specifies the order in which to return the rows.", "It filters rows before any groupings are made."],
+                correct: ["It specifies a search condition for a group or an aggregate."],
+                explanation: "The `WHERE` clause filters rows before aggregation, while the `HAVING` clause is used to filter the groups created by the `GROUP BY` clause based on the results of aggregate functions."
+            },
+            {
+                question: "A key that consists of more than one attribute to uniquely identify a record is called a:",
+                type: "radio",
+                options: ["Superkey", "Primary key", "Candidate key", "Composite key"],
+                correct: ["Composite key"],
+                explanation: "A composite key is a key that is formed by combining two or more columns in a table that can be used to uniquely identify each row in the table when the columns are combined."
+            },
+             {
+                question: "The `ON DELETE SET DEFAULT` clause in a foreign key constraint will:",
+                type: "radio",
+                options: ["Set the foreign key value to its defined default when the referenced primary key row is deleted.", "Delete the entire row containing the foreign key.", "Set the foreign key value to NULL when the referenced row is deleted.", "Prevent the deletion of the referenced primary key row."],
+                correct: ["Set the foreign key value to its defined default when the referenced primary key row is deleted."],
+                explanation: "This referential integrity action specifies that if a row in the parent (referenced) table is deleted, the corresponding foreign key values in the child table will be updated to the column's default value."
+            },
+            {
+                question: "Which of the following SQL clauses in a `SELECT` statement is processed last?",
+                type: "radio",
+                options: ["WHERE", "GROUP BY", "HAVING", "ORDER BY"],
+                correct: ["ORDER BY"],
+                explanation: "The logical query processing order is generally: FROM, WHERE, GROUP BY, HAVING, SELECT, and finally ORDER BY. The `ORDER BY` clause is applied at the very end to sort the final result set."
+            },
+            {
+                question: "In database hosting, what does DBaaS stand for?",
+                type: "radio",
+                options: ["Database as a Service", "Database and Software", "Database Administration System", "Distributed Database and Services"],
+                correct: ["Database as a Service"],
+                explanation: "DBaaS (Database as a Service) is a cloud computing service model that provides users with access to a database without the need for setting up physical hardware, installing software, or concerning themselves with database maintenance."
+            },
+            {
+                question: "A query that returns all departments and any employees working in them, but also includes departments that have no employees, would require a:",
+                type: "radio",
+                options: ["INNER JOIN", "LEFT OUTER JOIN (with Department on the left)", "CROSS JOIN", "Subquery"],
+                correct: ["LEFT OUTER JOIN (with Department on the left)"],
+                explanation: "A `LEFT OUTER JOIN` from the Department table to the Employee table will return all departments. For departments that have employees, the employee information will be joined. For departments without employees, the columns for employee information will be NULL."
+            },
+            {
+                question: "What is the primary purpose of creating an index in a database?",
+                type: "radio",
+                options: ["To enforce data integrity rules.", "To provide a logical, abstract view of the data.", "To improve the speed of data retrieval operations.", "To define the structure and data types of a table."],
+                correct: ["To improve the speed of data retrieval operations."],
+                explanation: "An index is a data structure that improves the speed of data retrieval operations on a database table at the cost of additional writes and storage space. It allows the database to find rows with specific column values much more quickly."
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let userAnswers = Array(quizData.length).fill(null);
+
+        const quizContent = document.getElementById('quiz-content');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const questionCounter = document.getElementById('question-counter');
+
+        function renderQuestion() {
+            const questionData = quizData[currentQuestionIndex];
+            let optionsHtml = '';
+
+            questionData.options.forEach((option, index) => {
+                const inputId = `q${currentQuestionIndex}-option${index}`;
+                optionsHtml += `
+                    <label for="${inputId}" class="option">
+                        <input type="${questionData.type}" id="${inputId}" name="question${currentQuestionIndex}" value="${option}">
+                        <span>${option}</span>
+                    </label>
+                `;
+            });
+
+            quizContent.innerHTML = `
+                <div class="question-card">
+                    <div class="mb-4">
+                        <p class="text-sm font-semibold text-indigo-600">${questionData.type === 'checkbox' ? 'Question (Select all that apply)' : 'Question (Select the most suitable answer)'}</p>
+                        <h2 class="text-xl font-semibold text-gray-800">${currentQuestionIndex + 1}. ${questionData.question}</h2>
+                    </div>
+                    <div id="options-container">${optionsHtml}</div>
+                    <div class="mt-4">
+                        <button class="btn btn-primary" onclick="checkAnswer()">Check My Answer</button>
+                    </div>
+                    <div id="feedback-container" class="mt-4"></div>
+                </div>
+            `;
+
+            updateNavigation();
+            restoreAnswer();
+        }
+
+        function updateNavigation() {
+            prevBtn.disabled = currentQuestionIndex === 0;
+            nextBtn.disabled = currentQuestionIndex === quizData.length - 1;
+            prevBtn.classList.toggle('opacity-50', prevBtn.disabled);
+            prevBtn.classList.toggle('cursor-not-allowed', prevBtn.disabled);
+            nextBtn.classList.toggle('opacity-50', nextBtn.disabled);
+            nextBtn.classList.toggle('cursor-not-allowed', nextBtn.disabled);
+            questionCounter.textContent = `Question ${currentQuestionIndex + 1} of ${quizData.length}`;
+        }
+
+        function checkAnswer() {
+            const questionData = quizData[currentQuestionIndex];
+            const feedbackContainer = document.getElementById('feedback-container');
+            const optionsContainer = document.getElementById('options-container');
+            
+            const selectedOptions = Array.from(document.querySelectorAll(`input[name="question${currentQuestionIndex}"]:checked`)).map(el => el.value);
+            userAnswers[currentQuestionIndex] = selectedOptions;
+
+            let isCorrect = false;
+            if (questionData.type === 'checkbox') {
+                isCorrect = selectedOptions.length === questionData.correct.length && selectedOptions.every(option => questionData.correct.includes(option));
+            } else {
+                isCorrect = selectedOptions.length === 1 && selectedOptions[0] === questionData.correct[0];
+            }
+
+            let feedbackHtml = '';
+            if (isCorrect) {
+                feedbackHtml = `<div class="feedback correct"><strong>Correct!</strong> Well done.</div>`;
+            } else {
+                feedbackHtml = `<div class="feedback incorrect"><strong>Incorrect.</strong> Please review the explanation below.</div>`;
+            }
+
+            feedbackHtml += `<div class="explanation"><strong>Explanation:</strong> ${questionData.explanation}</div>`;
+            feedbackContainer.innerHTML = feedbackHtml;
+
+            // Disable inputs and button after checking
+            document.querySelectorAll(`input[name="question${currentQuestionIndex}"]`).forEach(input => input.disabled = true);
+            document.querySelector('.btn-primary').disabled = true;
+            document.querySelector('.btn-primary').classList.add('opacity-50', 'cursor-not-allowed');
+        }
+        
+        function saveAnswer() {
+             const selectedOptions = Array.from(document.querySelectorAll(`input[name="question${currentQuestionIndex}"]:checked`)).map(el => el.value);
+             if (selectedOptions.length > 0) {
+                userAnswers[currentQuestionIndex] = selectedOptions;
+             } else {
+                userAnswers[currentQuestionIndex] = null;
+             }
+        }
+
+        function restoreAnswer() {
+            const savedAnswer = userAnswers[currentQuestionIndex];
+            if (savedAnswer) {
+                savedAnswer.forEach(value => {
+                    const input = document.querySelector(`input[value="${value}"]`);
+                    if (input) {
+                        input.checked = true;
+                    }
+                });
+            }
+        }
+
+        prevBtn.addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                saveAnswer();
+                currentQuestionIndex--;
+                renderQuestion();
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentQuestionIndex < quizData.length - 1) {
+                saveAnswer();
+                currentQuestionIndex++;
+                renderQuestion();
+            }
+        });
+
+        // Initial render
+        renderQuestion();
+    </script>
+
+</body>
+</html>
